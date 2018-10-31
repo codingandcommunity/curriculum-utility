@@ -1,0 +1,31 @@
+Mon Mar 17: Scott Chacon <schacon@gee-mail.com> modified b/Rakefile:
+    changed the version number
+
+Added 7 lines, starting from line 5
+
+Changes:
+========
+ spec = Gem::Specification.new do |s|
+
+     s.platform  =   Gem::Platform::RUBY
+
+     s.name      =   "simplegit"
+
+-    s.version   =   "0.1.0"
+
++    s.version   =   "0.1.1"
+
+     s.author    =   "Scott Chacon"
+
+     s.email     =   "schacon@gee-mail.com"
+
+     s.summary   =   "A simple gem for using Git in Ruby code."
+
+Sat Mar 15: Scott Chacon <schacon@gee-mail.com> modified b/lib/simplegit.rb:
+    removed unnecessary test
+
+Added 8 lines, starting from line 18
+
+Changes:
+========
+     end
