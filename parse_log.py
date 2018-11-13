@@ -1,6 +1,7 @@
 import os
+import sys
 
-dir = 'C:/Users/Ritvik Vaish/Projects' # Add directory here
+dir = sys.argv[1] #'C:/Users/Ritvik Vaish/Projects' # Add directory here
 
 def parseFile(fp):
     ofile = open("parsed_output.txt", "w+")
