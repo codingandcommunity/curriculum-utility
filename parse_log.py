@@ -1,75 +1,46 @@
-import os
 import sys
+import re
 
-dir = sys.argv[1] #'C:/Users/Ritvik Vaish/Projects' # Add directory here
+# array to store dict of commit data
+commits = []
 
-def parseFile(fp):
-    ofile = open("parsed_output.txt", "w+")
-    line = fp.readline() # commit id
-    while True:
-        line = fp.readline()
-        if line.split()[0] != "Author:":
-            print("done") # some weird behavior here
-            break
-        author = ' '.join(line.split()[1:])
-        line = fp.readline()
-        time = ' '.join(line.split()[1:4])
+def parseCommit(commitLines):
+	# dict to store commit data
+	commit = {}
+	# iterate lines and save
+	for nextLine in commitLines:
+		if nextLine == '' or nextLine == '\n':
+			# ignore empty lines
+			pass
+		elif bool(re.match('commit', nextLine, re.IGNORECASE)):
+			# commit xxxx
+			if len(commit) != 0:		## new commit, so re-initialize
+				commits.append(commit)
+				commit = {}
+			commit = {'hash' : re.match('commit (.*)', nextLine, re.IGNORECASE).group(1) }
+		elif bool(re.match('merge:', nextLine, re.IGNORECASE)):
+			# Merge: xxxx xxxx
+			pass
+		elif bool(re.match('author:', nextLine, re.IGNORECASE)):
+			# Author: xxxx <xxxx@xxxx.com>
+			m = re.compile('Author: (.*) <(.*)>').match(nextLine)
+			commit['author'] = m.group(1)
+			commit['email'] = m.group(2)
+		elif bool(re.match('date:', nextLine, re.IGNORECASE)):
+			# Date: xxx
+			pass
+		elif bool(re.match('    ', nextLine, re.IGNORECASE)):
+			# (4 empty spaces)
+			if commit.get('message') is None:
+				commit['message'] = nextLine.strip()
+		else:
+			print ('Unable to parse: ' + nextLine)
 
-        line = fp.readline() # blank line
+if __name__ == '__main__':
+	parseCommit(sys.stdin.readlines())
 
-        message = fp.readline() # commit message
-
-        line = fp.readline() # blank line
-
-        # start chunk
-        line = fp.readline()
-        if line.split()[0] == "diff":
-            fname = line.split()[-1] # file being modified
-        else:
-            continue # no diffs present
-
-        # index, file legends don't seem useful
-        line = fp.readline()
-        line = fp.readline()
-        line = fp.readline()
-
-        # begin chunks of edits
-        while line:
-            line = fp.readline()
-            markers = line.split()
-            if markers[0] == "@@":
-                if markers[1][1] == '-':
-                    removed = [markers[1].split(',')[0][1:], markers[1].split(',')[1]]
-                    added = [markers[2].split(',')[0][1:], markers[2].split(',')[1]]
-                else:
-                    removed = ""
-                    added = [markers[1].split(',')[0][1:], markers[1].split(',')[1]]
-                
-                line = fp.readline()
-                edits = ""
-                while line.strip():
-                    edits = edits + line + "\n"
-                    line = fp.readline()
-                
-                ofile.write(time + ": " + author + " modified " + fname + ":\n")
-                ofile.write(message + "\n")
-                if removed == "":
-                    ofile.write("Added " + added[1] + " lines, starting from line " + added[0] + "\n\n")
-                else:
-                    ofile.write("Removed " + removed[1] + "lines, starting from line " + removed[0] + "\n")
-                    ofile.write("Added " + added[1] + " lines, starting from line " + added[0] + "\n\n")
-                ofile.write("Changes:\n" + "========\n" + edits)
-
-            else:
-                break
-    
-    ofile.close()
-
-for file in os.listdir(dir):
-    if file.endswith(".txt"):
-        try:
-            with open(os.path.join(dir, file), "r") as logFile:
-                parseFile(logFile)
-        
-        except:
-            print("No more files")
+	# print commits
+	print 'Author'.ljust(15) + '  ' + 'Email'.ljust(20) +'  ' + 'Hash'.ljust(8) + '  ' + 'Message'.ljust(20)
+	print "================================================================================="
+	for commit in commits:
+		print commit['author'].ljust(15) + '  ' + commit['email'][:20].ljust(20) + '  ' +  commit['hash'][:7].ljust(8) + '  ' + commit['message']
