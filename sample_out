@@ -1,0 +1,7 @@
+[ritvikv@laptop]$ git log | ~/bin/parse_log.py
+Author           Email                 Hash      Message
+=================================================================================
+Ritvik Vaish     vaishr@rpi.edu        80eab67   Bugfixes
+Ethan Graf       grafe@rpi.edu         30ce75f   Created new branch dev
+Ritvik Vaish     vaishr@rpi.edu        2677b9d   - Changed output format
+Ritvik Vaish     vaishr@rpi.edu        55b6198   Added initial parser
